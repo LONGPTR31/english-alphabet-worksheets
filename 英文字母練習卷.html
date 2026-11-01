@@ -153,9 +153,10 @@
   </label>
   <label><input type="checkbox" id="zhToggle" checked> 顯示中文</label>
   <label><input type="checkbox" id="slowToggle"> 🐢 慢速念</label>
-  <button id="shuffleBtn">🔀 換一組 Find it</button>
+  <button id="shuffleBtn">🔀 換一組題目</button>
   <button id="clearBtn">🧹 清除圈選</button>
-  <button id="printBtn" class="primary">🖨️ 列印 A4</button>
+  <button id="printOneBtn" class="primary">🖨️ 列印這一張</button>
+  <button id="printAllBtn" class="primary">🖨️ 全部列印（26 張）</button>
   <span class="hint">🔊 點圖卡、句子、字母都會念｜Find it 點圖來圈｜列印：A4、邊界「無」、勾選「背景圖形」</span>
 </div>
 <div class="pages" id="pages"></div>
@@ -218,6 +219,20 @@ const EXTRA = [
   ['watch','⌚','手錶'],
   ['yo-yo','🪀','溜溜球'],['yarn','🧶','毛線'],['yummy','😋','好吃'],
   ['zipper','🤐','拉鍊'],
+  // 讓圖卡隨機抽時有得選（每個字母盡量 5 個以上）
+  ['ax','🪓','斧頭'],['arm','💪','手臂'],['avocado','🥑','酪梨'],
+  ['dinosaur','🦕','恐龍'],['drum','🥁','鼓'],['donut','🍩','甜甜圈'],
+  ['earth','🌍','地球'],
+  ['goat','🐐','山羊'],['guitar','🎸','吉他'],
+  ['jeep','🚙','吉普車'],['jar','🫙','罐子'],
+  ['koala','🐨','無尾熊'],['kiwi','🥝','奇異果'],
+  ['ladybug','🐞','瓢蟲'],['lollipop','🍭','棒棒糖'],
+  ['mushroom','🍄','香菇'],
+  ['nut','🥜','花生'],
+  ['otter','🦦','水獺'],['ox','🐂','公牛'],
+  ['robot','🤖','機器人'],['ring','💍','戒指'],
+  ['volleyball','🏐','排球'],
+  ['wolf','🐺','狼'],['worm','🪱','蟲'],
 ].map(([w,e,zh])=>({w,e,zh}));
 EXTRA.push({w:'zero',num:0,zh:'零',kind:'num'});
 EXTRA.push({w:'zigzag',zh:'鋸齒線',kind:'svg',
@@ -227,35 +242,35 @@ EXTRA.push({w:'zigzag',zh:'鋸齒線',kind:'svg',
 const ALL = [...BANK, ...EXTRA, ...COLORS.filter(c=>c.w!=='orange'), ...NUMBERS];
 const byWord = w => ALL.find(x=>x.w===w) || COLORS.find(x=>x.w===w);
 
-/* ===== 每個字母的主要單字與句子 ===== */
+/* ===== 每個字母的句子（圖卡、描寫單字每次從題庫隨機抽） ===== */
 const LETTERS = {
-  A:{f:['apple','ant','airplane','alligator'], s:'An ant is on an apple.'},
-  B:{f:['ball','banana','bed','bus'], s:'A bear is on the bus.'},
-  C:{f:['cat','cake','car','cookie'], s:'The cat has a cookie.'},
-  D:{f:['dog','duck','door','diamond'], s:'A dog and a duck are at the door.'},
-  E:{f:['elephant','egg','eye','ear'], s:'An elephant has big ears.'},
-  F:{f:['fish','frog','fox','flower'], s:'A frog sits on a flower.'},
-  G:{f:['giraffe','grapes','gift','glasses'], s:'The giraffe gets a gift.'},
-  H:{f:['horse','hat','house','hand'], s:'A horse has a hat.'},
-  I:{f:['ice cream','ice','insect','island'], s:'I like ice cream.'},
-  J:{f:['juice','jeans','jacket','jellyfish'], s:'I have a jacket and jeans.'},
-  Q:{f:['queen','quack','quiet','question'], s:'The queen is quiet.'},
-  V:{f:['van','violin','volcano','vegetables'], s:'A violin is in the van.'},
+  A:{s:'An ant is on an apple.'},
+  B:{s:'A bear is on the bus.'},
+  C:{s:'The cat has a cookie.'},
+  D:{s:'A dog and a duck are at the door.'},
+  E:{s:'An elephant has big ears.'},
+  F:{s:'A frog sits on a flower.'},
+  G:{s:'The giraffe gets a gift.'},
+  H:{s:'A horse has a hat.'},
+  I:{s:'I like ice cream.'},
+  J:{s:'I have a jacket and jeans.'},
+  K:{s:'The king has a kite.'},
+  L:{s:'A lion likes lemons.'},
+  M:{s:'My monkey likes milk.'},
+  N:{s:'Nine eggs are in the nest.'},
+  O:{s:'One owl has an orange.'},
+  P:{s:'A pig and a panda eat pizza.'},
+  Q:{s:'The queen is quiet.'},
+  R:{s:'A rabbit runs in the rain.'},
+  S:{s:'A snake sees a star.'},
+  T:{s:'A turtle is on the train.'},
+  U:{s:'Up, up, my umbrella!'},
+  V:{s:'A violin is in the van.'},
+  W:{s:'A whale is in the water.'},
   // X 開頭的字很少，幼稚園通常教「字裡有 x」：box、fox、six
-  X:{f:['box','fox','six','x-ray'], s:'A fox is in a box.', inside:true, pill:'says /ks/'},
-  K:{f:['kite','key','king','kangaroo'], s:'The king has a kite.'},
-  L:{f:['lion','lemon','leaf','leg'], s:'A lion likes lemons.'},
-  M:{f:['monkey','mouse','milk','moon'], s:'My monkey likes milk.'},
-  N:{f:['nose','nest','noodles','nine'], s:'Nine eggs are in the nest.'},
-  O:{f:['owl','octopus','orange','one'], s:'One owl has an orange.'},
-  P:{f:['pig','panda','penguin','pizza'], s:'A pig and a panda eat pizza.'},
-  R:{f:['rabbit','rocket','rainbow','rain'], s:'A rabbit runs in the rain.'},
-  S:{f:['sun','snake','strawberry','star'], s:'A snake sees a star.'},
-  T:{f:['tiger','turtle','train','tree'], s:'A turtle is on the train.'},
-  U:{f:['umbrella','unicorn','up','UFO'], s:'Up, up, my umbrella!'},
-  W:{f:['whale','watermelon','water','watch'], s:'A whale is in the water.'},
-  Y:{f:['yo-yo','yellow','yarn','yummy'], s:'The yo-yo is yellow.'},
-  Z:{f:['zebra','zipper','zigzag','zero'], s:'A zebra is at the zoo.'},
+  X:{s:'A fox is in a box.', inside:true, pill:'says /ks/'},
+  Y:{s:'The yo-yo is yellow.'},
+  Z:{s:'A zebra is at the zoo.'},
 };
 // 發音容易混淆的字母，Find it 不拿來當干擾項
 const CONFUSE = {C:'K',K:'C'};
@@ -339,9 +354,16 @@ function traceSVG(texts, mode){
 }
 
 /* ===== 一張練習卷 ===== */
+// 圖卡：從這個字母的所有單字隨機抽 4 個；有圖案的優先，數字不夠才補
+function pickCards(L){
+  const pool = shuffle(ALL.filter(x=>hasLetter(x.w, L)));
+  const pics = pool.filter(x=>x.kind!=='num'), nums = pool.filter(x=>x.kind==='num');
+  return [...pics, ...nums].slice(0, 4);
+}
+
 function sheetHTML(L){
   const cfg = LETTERS[L];
-  const feat = cfg.f.map(byWord);
+  const feat = pickCards(L);
   const n = feat.length;
   const cardW = n===4||n===2 ? 88 : n===3 ? 58 : 180;
   const maxF = n===4 ? 12 : n===1 ? 20 : 14;
@@ -367,15 +389,16 @@ function sheetHTML(L){
   const findInst = isInside(L)
     ? `Circle the pictures with the letter ${L.toLowerCase()}.<small>圈出單字裡有 ${L.toLowerCase()} 的圖</small>`
     : `Circle the pictures that start with ${L}.<small>圈出開頭是 ${L} 的圖</small>`;
-  const pillText = cfg.pill || `is for ${esc(cfg.f[0])}`;
+  const pillText = cfg.pill || `is for ${esc(feat[0].w)}`;
   // 念出來的句子（X 的 /ks/ 用例字帶過，語音念音標會怪怪的）
   const letterSay = `the letter ${L}`;
-  const pillSay = isInside(L) ? `${L}. ${cfg.f.slice(0,3).join(', ')}.` : `${L} is for ${cfg.f[0]}.`;
+  const pillSay = isInside(L) ? `${L}. ${feat.slice(0,3).map(x=>x.w).join(', ')}.` : `${L} is for ${feat[0].w}.`;
   const findItems = shuffle([...targets, ...distract]).map(it=>`
     <div class="fi say" data-say="${attr(it.w)}" data-ok="${targets.includes(it)?1:0}"><div class="pic">${picHTML(it,17)}</div><div class="lbl">${esc(it.w)}</div></div>`).join('');
 
   const lo = L.toLowerCase();
-  const traceWord = cfg.f.map(byWord).find(x=>x.kind!=='num')?.w || cfg.f[0];
+  // 描寫的單字：從這張的圖卡隨機挑一個（不挑數字）
+  const traceWord = shuffle(feat.filter(x=>x.kind!=='num'))[0].w;
 
   return `
   <section class="sheet" data-letter="${L}">
@@ -426,19 +449,41 @@ function sheetHTML(L){
 const sel = document.getElementById('letterSel');
 const pages = document.getElementById('pages');
 const KEYS = Object.keys(LETTERS).sort();
-sel.innerHTML = KEYS.map(L=>`<option value="${L}">${L} ${LETTERS[L].f[0]}</option>`).join('')
+sel.innerHTML = KEYS.map(L=>`<option value="${L}">${L} ${L.toLowerCase()}</option>`).join('')
   + `<option value="ALL">全部字母（${KEYS.length} 張）</option>`;
 
+// 每個字母抽好的題目先記住，切換字母再切回來、或全部列印時，內容和畫面上看到的一樣
+const cache = {};
+const getSheet = L => cache[L] || (cache[L] = sheetHTML(L));
+const currentList = () => sel.value==='ALL' ? KEYS : [sel.value];
+
 function render(){
-  const v = sel.value;
-  const list = v==='ALL' ? KEYS : [v];
-  pages.innerHTML = list.map(sheetHTML).join('');
-  try{ localStorage.setItem('ws-letter', v); }catch(e){}
+  pages.innerHTML = currentList().map(getSheet).join('');
+  document.getElementById('printOneBtn').style.display = sel.value==='ALL' ? 'none' : '';
+  try{ localStorage.setItem('ws-letter', sel.value); }catch(e){}
 }
 try{ const saved = localStorage.getItem('ws-letter'); if(saved && [...sel.options].some(o=>o.value===saved)) sel.value = saved; }catch(e){}
 sel.addEventListener('change', render);
-document.getElementById('shuffleBtn').addEventListener('click', render);
-document.getElementById('printBtn').addEventListener('click', ()=>window.print());
+document.getElementById('shuffleBtn').addEventListener('click', ()=>{
+  currentList().forEach(L=>delete cache[L]);
+  render();
+});
+
+// 等圖案都載入再列印，不然可能印出空白
+function waitImages(ms){
+  const imgs = [...pages.querySelectorAll('img')].filter(i=>!i.complete);
+  const all = Promise.all(imgs.map(i=>new Promise(r=>{ i.addEventListener('load',r); i.addEventListener('error',r); })));
+  return Promise.race([all, new Promise(r=>setTimeout(r, ms))]);
+}
+document.getElementById('printOneBtn').addEventListener('click', ()=>window.print());
+document.getElementById('printAllBtn').addEventListener('click', async ()=>{
+  if(sel.value==='ALL'){ window.print(); return; }
+  // 暫時把 26 張都放上來，印完再回到原本那張
+  pages.innerHTML = KEYS.map(getSheet).join('');
+  await waitImages(8000);
+  window.addEventListener('afterprint', render, {once:true});
+  window.print();
+});
 
 /* ===== 螢幕比 A4 窄時（手機），整張等比例縮小 ===== */
 const SHEET_PX = 210 * 96 / 25.4;   // A4 寬 210mm 換成 px
