@@ -123,6 +123,16 @@
     background:#fff;border:3px solid var(--yellow);border-radius:28px;padding:22px 40px;font:700 44px "Fredoka",sans-serif;
     color:var(--red);box-shadow:0 10px 40px rgba(0,0,0,.18);transition:all .3s cubic-bezier(.3,1.6,.6,1)}
   #cheer.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  .say,.play{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+
+  /* ---------- 手機、平板：工具列變精簡，練習卷整張縮小到螢幕寬（由 fitSheets() 設定 zoom） ---------- */
+  @media screen and (max-width:840px){
+    .toolbar{position:static;gap:8px 10px;padding:10px 12px;font-size:14px}
+    .toolbar select,.toolbar button{padding:6px 10px}
+    .toolbar .hint{display:none}
+    .pages{padding:12px 8px 32px;gap:12px}
+    #cheer{font-size:30px;padding:16px 28px}
+  }
 
   @page{size:A4;margin:0}
   @media print{
@@ -130,7 +140,7 @@
     .toolbar,.play,.spk,#cheer{display:none !important}
     .fi.circled::after{display:none}
     .speaking{box-shadow:none !important;animation:none !important;transform:none !important}
-    .pages{padding:0;gap:0;display:block}
+    .pages{padding:0;gap:0;display:block;zoom:1 !important}
     .sheet{box-shadow:none;break-after:page;page-break-after:always}
     .sheet:last-child{break-after:auto;page-break-after:auto}
   }
@@ -429,6 +439,18 @@ try{ const saved = localStorage.getItem('ws-letter'); if(saved && [...sel.option
 sel.addEventListener('change', render);
 document.getElementById('shuffleBtn').addEventListener('click', render);
 document.getElementById('printBtn').addEventListener('click', ()=>window.print());
+
+/* ===== 螢幕比 A4 窄時（手機），整張等比例縮小 ===== */
+const SHEET_PX = 210 * 96 / 25.4;   // A4 寬 210mm 換成 px
+function fitSheets(){
+  const avail = document.documentElement.clientWidth - 16;
+  pages.style.zoom = Math.min(1, avail / SHEET_PX);
+}
+fitSheets();
+window.addEventListener('resize', fitSheets);
+window.addEventListener('orientationchange', fitSheets);
+window.addEventListener('beforeprint', ()=>{ pages.style.zoom = 1; });
+window.addEventListener('afterprint', fitSheets);
 
 /* ===== 語音（瀏覽器內建的英文發音） ===== */
 const TTS = 'speechSynthesis' in window ? window.speechSynthesis : null;
