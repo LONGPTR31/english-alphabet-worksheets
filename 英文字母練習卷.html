@@ -233,6 +233,11 @@ const EXTRA = [
   ['robot','🤖','機器人'],['ring','💍','戒指'],
   ['volleyball','🏐','排球'],
   ['wolf','🐺','狼'],['worm','🪱','蟲'],
+  ['iguana','🦎','鬣蜥'],['idea','💡','好點子'],
+  ['quiz','📝','小考'],['quick','🏃','快'],['quarter','🪙','硬幣'],
+  ['upside down','🙃','倒過來'],['unhappy','☹️','不開心'],
+  ['yawn','🥱','打哈欠'],['yes','✅','是'],['yolk','🍳','蛋黃'],
+  ['zzz','💤','呼呼睡'],['zap','⚡','電一下'],
 ].map(([w,e,zh])=>({w,e,zh}));
 EXTRA.push({w:'zero',num:0,zh:'零',kind:'num'});
 EXTRA.push({w:'zigzag',zh:'鋸齒線',kind:'svg',
@@ -452,7 +457,7 @@ const KEYS = Object.keys(LETTERS).sort();
 sel.innerHTML = KEYS.map(L=>`<option value="${L}">${L} ${L.toLowerCase()}</option>`).join('')
   + `<option value="ALL">全部字母（${KEYS.length} 張）</option>`;
 
-// 每個字母抽好的題目先記住，切換字母再切回來、或全部列印時，內容和畫面上看到的一樣
+// 抽好的題目先記住，全部列印時目前這張和畫面上看到的一樣
 const cache = {};
 const getSheet = L => cache[L] || (cache[L] = sheetHTML(L));
 const currentList = () => sel.value==='ALL' ? KEYS : [sel.value];
@@ -463,7 +468,11 @@ function render(){
   try{ localStorage.setItem('ws-letter', sel.value); }catch(e){}
 }
 try{ const saved = localStorage.getItem('ws-letter'); if(saved && [...sel.options].some(o=>o.value===saved)) sel.value = saved; }catch(e){}
-sel.addEventListener('change', render);
+// 切換字母就重新抽一組
+sel.addEventListener('change', ()=>{
+  currentList().forEach(L=>delete cache[L]);
+  render();
+});
 document.getElementById('shuffleBtn').addEventListener('click', ()=>{
   currentList().forEach(L=>delete cache[L]);
   render();
