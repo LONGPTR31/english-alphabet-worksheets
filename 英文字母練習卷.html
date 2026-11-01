@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>英文字母練習卷</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Andika&family=Fredoka:wght@500;600;700&family=Noto+Sans+TC:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fcf8f1;
+    --card:#fffdf9;
+    --line:#ecd6c4;
+    --red:#d9503a;
+    --yellow:#e9b23c;
+    --sage:#e2e6da;
+    --sage-dark:#6f7f5d;
+    --peach:#fbe7d4;
+    --pink:#f7dbd3;
+    --pink-dark:#d77a68;
+    --ink:#1f1b18;
+    --muted:#6b625b;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#e9e4dc;color:var(--ink);
+    font-family:"Fredoka","Noto Sans TC",system-ui,sans-serif;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact}
+
+  /* ---------- toolbar (screen only) ---------- */
+  .toolbar{position:sticky;top:0;z-index:10;display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;
+    justify-content:center;padding:12px 16px;background:#fffaf3;border-bottom:1px solid var(--line);
+    font-family:"Noto Sans TC",sans-serif;font-size:15px}
+  .toolbar label{display:flex;align-items:center;gap:6px}
+  .toolbar select,.toolbar button{font:inherit;padding:6px 12px;border-radius:999px;border:1px solid #d9c3b0;background:#fff;cursor:pointer}
+  .toolbar button.primary{background:var(--red);color:#fff;border-color:var(--red)}
+  .toolbar .hint{color:var(--muted);font-size:13px}
+
+  /* ---------- A4 sheet ---------- */
+  .pages{display:flex;flex-direction:column;align-items:center;gap:24px;padding:24px 16px 48px}
+  .sheet{width:210mm;height:297mm;background:var(--paper);padding:8mm 9mm 6mm;display:flex;flex-direction:column;
+    box-shadow:0 4px 24px rgba(60,40,20,.15);overflow:hidden;position:relative}
+
+  /* header */
+  .head{position:relative;height:54mm;flex:none}
+  .deco{position:absolute}
+  .big{position:absolute;left:0;right:0;top:-3mm;text-align:center;font-weight:700;font-size:42mm;line-height:1;letter-spacing:1mm}
+  .big .up{color:var(--red)} .big .lo{color:var(--yellow)}
+  .pill{position:absolute;left:50%;transform:translateX(-50%);bottom:0;background:var(--sage);border-radius:999px;
+    padding:1mm 9mm;font-size:8mm;font-weight:600;white-space:nowrap;display:flex;align-items:baseline;gap:2.5mm}
+  .pill b{color:var(--red);font-size:10mm;font-weight:700}
+
+  /* word cards */
+  .cards{height:104mm;flex:none;margin-top:3mm;display:grid;gap:4mm}
+  .cards.n4{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
+  .cards.n3{grid-template-columns:repeat(3,1fr)}
+  .cards.n2{grid-template-columns:1fr 1fr}
+  .cards.n1{grid-template-columns:1fr}
+  .card{background:var(--card);border:.5mm solid var(--line);border-radius:5mm;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:1.5mm;position:relative;overflow:hidden;padding:2mm}
+  .card .pic{display:flex;align-items:center;justify-content:center}
+  .card .pic img{display:block;width:100%;height:100%;object-fit:contain}
+  .n4 .pic{width:28mm;height:28mm}
+  .n3 .pic,.n2 .pic{width:46mm;height:46mm}
+  .n1 .pic{width:62mm;height:62mm}
+  .word{font-weight:600;line-height:1;white-space:nowrap}
+  .word .first{color:var(--red)}
+  .zh{font-family:"Noto Sans TC",sans-serif;font-size:3.6mm;color:var(--muted);font-weight:500}
+  .n1 .zh,.n2 .zh,.n3 .zh{font-size:4.6mm}
+  .card .spark{position:absolute;width:9mm;height:9mm}
+  .swatch{border-radius:50%;width:80%;height:80%;border:.6mm solid rgba(0,0,0,.12)}
+  .numtile{width:86%;height:86%;border-radius:50%;background:#f4ead9;display:flex;align-items:center;justify-content:center;
+    font-weight:700;color:var(--sage-dark);line-height:1}
+
+  /* sentence banner */
+  .banner{height:15mm;flex:none;margin-top:4mm;background:var(--peach);border-radius:4mm;display:flex;align-items:center;
+    justify-content:center;gap:4mm;font-weight:600;font-size:8.6mm;position:relative;white-space:nowrap}
+  .banner .hl{color:var(--red);font-weight:700}
+  .banner svg{flex:none;width:13mm;height:10mm}
+
+  /* bottom activities */
+  .bottom{flex:1;margin-top:4mm;display:grid;grid-template-columns:1fr 1fr;gap:4mm;min-height:0}
+  .box{border:.5mm solid var(--line);border-radius:5mm;background:var(--card);padding:3mm 4mm;display:flex;flex-direction:column;min-height:0}
+  .boxhead{display:flex;align-items:center;gap:2.5mm}
+  .num{width:9mm;height:9mm;border-radius:50%;color:#fff;font-weight:600;font-size:5.4mm;display:flex;align-items:center;justify-content:center;flex:none}
+  .ttl{flex:1;border-radius:999px;text-align:center;font-weight:600;font-size:6mm;padding:.6mm 0}
+  .find .num{background:var(--sage-dark)} .find .ttl{background:var(--sage)}
+  .write .num{background:var(--pink-dark)} .write .ttl{background:var(--pink)}
+  .inst{text-align:center;font-size:3.9mm;margin-top:1.4mm;font-weight:500}
+  .inst small{display:block;font-family:"Noto Sans TC",sans-serif;font-size:3.1mm;color:var(--muted);margin-top:.3mm}
+  .grid6{flex:1;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr;gap:1.5mm;margin-top:2mm}
+  .fi{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.8mm}
+  .fi .pic{width:17mm;height:17mm;display:flex;align-items:center;justify-content:center}
+  .fi .pic img{width:100%;height:100%;object-fit:contain}
+  .fi .lbl{font-weight:600;font-size:4.6mm;line-height:1;white-space:nowrap}
+  .trace{display:block;width:100%;margin-top:1.5mm}
+  .wlabel{font-weight:500;font-size:4.4mm;margin-top:2mm}
+
+  .foot{flex:none;height:6mm;display:flex;align-items:flex-end;justify-content:space-between;font-size:3.4mm;color:var(--muted);
+    font-family:"Fredoka","Noto Sans TC",sans-serif}
+  .foot .blank{display:inline-block;width:34mm;border-bottom:.3mm solid #b9aea4;margin-left:1.5mm}
+
+  body.nozh .zh, body.nozh .inst small{display:none}
+
+  /* ---------- 語音互動（只在螢幕上） ---------- */
+  .say{cursor:pointer;transition:transform .15s, box-shadow .2s}
+  .card.say:hover,.fi.say:hover{transform:scale(1.03)}
+  .speaking{box-shadow:0 0 0 1mm #f2c46d;border-radius:4mm}
+  .card.speaking{transform:scale(1.04)}
+  .big.speaking,.pill.speaking{box-shadow:none;animation:bounce .5s ease}
+  .spk{position:absolute;right:3mm;bottom:2.5mm;font-size:4.2mm;opacity:.55}
+  .play{position:absolute;left:4mm;top:4mm;z-index:2;font:600 4mm "Fredoka",sans-serif;padding:1.4mm 4mm;border-radius:999px;
+    border:.4mm solid #d9c3b0;background:#fff;cursor:pointer;color:var(--ink)}
+  .play:hover{background:var(--peach)}
+  .fi{position:relative;border-radius:50%}
+  .fi.circled::after{content:"";position:absolute;inset:-1mm 2mm;border:.9mm solid #5aa35a;border-radius:50%;pointer-events:none}
+  .fi.wrong{animation:shake .45s}
+  .trace.say:hover{background:#fbf1e6}
+  .trace .trace{margin-top:0}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-2mm)}40%,80%{transform:translateX(2mm)}}
+  @keyframes bounce{0%,100%{transform:translateY(0)}40%{transform:translateY(-2mm)}}
+  #cheer{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%) scale(.6);opacity:0;pointer-events:none;z-index:50;
+    background:#fff;border:3px solid var(--yellow);border-radius:28px;padding:22px 40px;font:700 44px "Fredoka",sans-serif;
+    color:var(--red);box-shadow:0 10px 40px rgba(0,0,0,.18);transition:all .3s cubic-bezier(.3,1.6,.6,1)}
+  #cheer.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+
+  @page{size:A4;margin:0}
+  @media print{
+    html,body{background:none}
+    .toolbar,.play,.spk,#cheer{display:none !important}
+    .fi.circled::after{display:none}
+    .speaking{box-shadow:none !important;animation:none !important;transform:none !important}
+    .pages{padding:0;gap:0;display:block}
+    .sheet{box-shadow:none;break-after:page;page-break-after:always}
+    .sheet:last-child{break-after:auto;page-break-after:auto}
+  }
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <label>字母
+    <select id="letterSel"></select>
+  </label>
+  <label><input type="checkbox" id="zhToggle" checked> 顯示中文</label>
+  <label><input type="checkbox" id="slowToggle"> 🐢 慢速念</label>
+  <button id="shuffleBtn">🔀 換一組 Find it</button>
+  <button id="clearBtn">🧹 清除圈選</button>
+  <button id="printBtn" class="primary">🖨️ 列印 A4</button>
+  <span class="hint">🔊 點圖卡、句子、字母都會念｜Find it 點圖來圈｜列印：A4、邊界「無」、勾選「背景圖形」</span>
+</div>
+<div class="pages" id="pages"></div>
+<div id="cheer">🎉 Great job!</div>
+
+<script>
+/* ===== 題庫（english-word-list.md） ===== */
+const BANK = [
+  // Animals
+  ['cat','🐱','貓'],['dog','🐶','狗'],['fish','🐟','魚'],['bird','🐦','鳥'],['pig','🐷','豬'],['cow','🐮','牛'],
+  ['duck','🦆','鴨子'],['rabbit','🐰','兔子'],['lion','🦁','獅子'],['monkey','🐵','猴子'],['frog','🐸','青蛙'],['bear','🐻','熊'],
+  ['horse','🐴','馬'],['elephant','🐘','大象'],['chicken','🐔','雞'],['tiger','🐯','老虎'],['mouse','🐭','老鼠'],['sheep','🐑','羊'],
+  ['snake','🐍','蛇'],['turtle','🐢','烏龜'],['panda','🐼','熊貓'],['fox','🦊','狐狸'],['bee','🐝','蜜蜂'],['butterfly','🦋','蝴蝶'],
+  ['owl','🦉','貓頭鷹'],['penguin','🐧','企鵝'],['whale','🐳','鯨魚'],['giraffe','🦒','長頸鹿'],['zebra','🦓','斑馬'],['crab','🦀','螃蟹'],
+  // Food
+  ['apple','🍎','蘋果'],['banana','🍌','香蕉'],['grapes','🍇','葡萄'],['orange','🍊','柳橙'],['strawberry','🍓','草莓'],['watermelon','🍉','西瓜'],
+  ['cherry','🍒','櫻桃'],['lemon','🍋','檸檬'],['pear','🍐','梨子'],['peach','🍑','桃子'],['carrot','🥕','紅蘿蔔'],['corn','🌽','玉米'],
+  ['cake','🍰','蛋糕'],['egg','🥚','蛋'],['bread','🍞','麵包'],['milk','🥛','牛奶'],['pizza','🍕','披薩'],['ice cream','🍦','冰淇淋'],
+  ['cookie','🍪','餅乾'],['candy','🍬','糖果'],
+  // Things
+  ['ball','⚽','球'],['book','📖','書'],['hat','👒','帽子'],['shoe','👟','鞋子'],['house','🏠','房子'],['cup','☕','杯子'],
+  ['clock','⏰','時鐘'],['key','🔑','鑰匙'],['bed','🛏️','床'],['chair','🪑','椅子'],['door','🚪','門'],['bag','🎒','書包'],
+  ['phone','📱','手機'],['umbrella','☂️','雨傘'],['balloon','🎈','氣球'],['gift','🎁','禮物'],['kite','🪁','風箏'],['pencil','✏️','鉛筆'],
+  ['teddy bear','🧸','泰迪熊'],['glasses','👓','眼鏡'],
+  // Vehicles
+  ['car','🚗','汽車'],['bus','🚌','公車'],['train','🚆','火車'],['airplane','✈️','飛機'],['boat','⛵','船'],['bike','🚲','腳踏車'],
+  ['truck','🚚','卡車'],['rocket','🚀','火箭'],['taxi','🚕','計程車'],['helicopter','🚁','直升機'],
+  // Body
+  ['eye','👁️','眼睛'],['ear','👂','耳朵'],['nose','👃','鼻子'],['mouth','👄','嘴巴'],['hand','✋','手'],['foot','🦶','腳'],
+  ['tooth','🦷','牙齒'],['leg','🦵','腿'],
+  // Nature
+  ['sun','☀️','太陽'],['moon','🌙','月亮'],['star','⭐','星星'],['cloud','☁️','雲'],['rain','🌧️','雨'],['snow','❄️','雪'],
+  ['rainbow','🌈','彩虹'],['tree','🌳','樹'],['flower','🌸','花'],['leaf','🍁','葉子'],['fire','🔥','火'],['water','💧','水'],
+  // Shapes
+  ['circle','🔵','圓形'],['square','🟦','正方形'],['triangle','🔺','三角形'],['heart','❤️','愛心'],['diamond','🔷','菱形'],
+].map(([w,e,zh])=>({w,e,zh}));
+
+const COLORS = [
+  ['red','#e2483d','紅色'],['blue','#3f86d9','藍色'],['green','#5aa35a','綠色'],['yellow','#f6c933','黃色'],['orange','#f08a2c','橘色'],
+  ['purple','#8e5bc4','紫色'],['pink','#f39ab8','粉紅色'],['brown','#8b5a36','咖啡色'],['black','#2a2a2a','黑色'],['white','#ffffff','白色'],
+].map(([w,color,zh])=>({w,color,zh,kind:'color'}));
+
+const NUMBERS = ['one','two','three','four','five','six','seven','eight','nine','ten']
+  .map((w,i)=>({w,num:i+1,zh:'一二三四五六七八九十'[i],kind:'num'}));
+
+// J、Q、V、X 題庫原本沒有，補上幼稚園常見的簡單單字
+const EXTRA = [
+  ['juice','🧃','果汁'],['jeans','👖','牛仔褲'],['jacket','🧥','外套'],['jellyfish','🪼','水母'],
+  ['queen','👸','皇后'],['quiet','🤫','安靜'],['question','❓','問號'],
+  ['van','🚐','廂型車'],['violin','🎻','小提琴'],['volcano','🌋','火山'],['vegetables','🥦','蔬菜'],
+  ['box','📦','箱子'],['x-ray','🩻','X光'],
+  // 補滿 4 張圖卡用
+  ['ant','🐜','螞蟻'],['alligator','🐊','鱷魚'],
+  ['ice','🧊','冰塊'],['island','🏝️','小島'],['insect','🐛','昆蟲'],
+  ['king','🤴','國王'],['kangaroo','🦘','袋鼠'],
+  ['nest','🪺','鳥巢'],['noodles','🍜','麵'],
+  ['octopus','🐙','章魚'],
+  ['quack','🦆','嘎嘎叫'],
+  ['up','⬆️','上面'],['unicorn','🦄','獨角獸'],['UFO','🛸','幽浮'],
+  ['watch','⌚','手錶'],
+  ['yo-yo','🪀','溜溜球'],['yarn','🧶','毛線'],['yummy','😋','好吃'],
+  ['zipper','🤐','拉鍊'],
+].map(([w,e,zh])=>({w,e,zh}));
+EXTRA.push({w:'zero',num:0,zh:'零',kind:'num'});
+EXTRA.push({w:'zigzag',zh:'鋸齒線',kind:'svg',
+  svg:'<svg viewBox="0 0 100 60" style="width:90%;height:90%"><polyline points="6,48 22,12 38,48 54,12 70,48 86,12 96,34" fill="none" stroke="#d9503a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>'});
+
+// orange 同時是水果和顏色：Find it 只用水果
+const ALL = [...BANK, ...EXTRA, ...COLORS.filter(c=>c.w!=='orange'), ...NUMBERS];
+const byWord = w => ALL.find(x=>x.w===w) || COLORS.find(x=>x.w===w);
+
+/* ===== 每個字母的主要單字與句子 ===== */
+const LETTERS = {
+  A:{f:['apple','ant','airplane','alligator'], s:'An ant is on an apple.'},
+  B:{f:['ball','banana','bed','bus'], s:'A bear is on the bus.'},
+  C:{f:['cat','cake','car','cookie'], s:'The cat has a cookie.'},
+  D:{f:['dog','duck','door','diamond'], s:'A dog and a duck are at the door.'},
+  E:{f:['elephant','egg','eye','ear'], s:'An elephant has big ears.'},
+  F:{f:['fish','frog','fox','flower'], s:'A frog sits on a flower.'},
+  G:{f:['giraffe','grapes','gift','glasses'], s:'The giraffe gets a gift.'},
+  H:{f:['horse','hat','house','hand'], s:'A horse has a hat.'},
+  I:{f:['ice cream','ice','insect','island'], s:'I like ice cream.'},
+  J:{f:['juice','jeans','jacket','jellyfish'], s:'I have a jacket and jeans.'},
+  Q:{f:['queen','quack','quiet','question'], s:'The queen is quiet.'},
+  V:{f:['van','violin','volcano','vegetables'], s:'A violin is in the van.'},
+  // X 開頭的字很少，幼稚園通常教「字裡有 x」：box、fox、six
+  X:{f:['box','fox','six','x-ray'], s:'A fox is in a box.', inside:true, pill:'says /ks/'},
+  K:{f:['kite','key','king','kangaroo'], s:'The king has a kite.'},
+  L:{f:['lion','lemon','leaf','leg'], s:'A lion likes lemons.'},
+  M:{f:['monkey','mouse','milk','moon'], s:'My monkey likes milk.'},
+  N:{f:['nose','nest','noodles','nine'], s:'Nine eggs are in the nest.'},
+  O:{f:['owl','octopus','orange','one'], s:'One owl has an orange.'},
+  P:{f:['pig','panda','penguin','pizza'], s:'A pig and a panda eat pizza.'},
+  R:{f:['rabbit','rocket','rainbow','rain'], s:'A rabbit runs in the rain.'},
+  S:{f:['sun','snake','strawberry','star'], s:'A snake sees a star.'},
+  T:{f:['tiger','turtle','train','tree'], s:'A turtle is on the train.'},
+  U:{f:['umbrella','unicorn','up','UFO'], s:'Up, up, my umbrella!'},
+  W:{f:['whale','watermelon','water','watch'], s:'A whale is in the water.'},
+  Y:{f:['yo-yo','yellow','yarn','yummy'], s:'The yo-yo is yellow.'},
+  Z:{f:['zebra','zipper','zigzag','zero'], s:'A zebra is at the zoo.'},
+};
+// 發音容易混淆的字母，Find it 不拿來當干擾項
+const CONFUSE = {C:'K',K:'C'};
+
+/* ===== 圖案（Twemoji，連不上網時改用系統 emoji） ===== */
+function twemojiUrl(e){
+  const cps=[...e].map(c=>c.codePointAt(0).toString(16)).filter(h=>h!=='fe0f');
+  return `https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/${cps.join('-')}.svg`;
+}
+function picHTML(item, sizeMm){
+  if(item.kind==='color'){
+    return `<div class="swatch" style="background:${item.color}"></div>`;
+  }
+  if(item.kind==='svg') return item.svg;
+  if(item.kind==='num'){
+    return `<div class="numtile" style="font-size:${sizeMm*0.6}mm">${item.num}</div>`;
+  }
+  return `<img alt="${item.w}" src="${twemojiUrl(item.e)}" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'${item.e}',style:'font-size:${sizeMm*0.8}mm;line-height:1'}))">`;
+}
+
+/* ===== 裝飾圖 ===== */
+const SUN = `<svg viewBox="0 0 100 100"><g stroke="#e9b23c" stroke-width="6" stroke-linecap="round">
+  ${[0,45,90,135,180,225,270,315].map(a=>{const r=a*Math.PI/180;return `<line x1="${50+34*Math.cos(r)}" y1="${50+34*Math.sin(r)}" x2="${50+46*Math.cos(r)}" y2="${50+46*Math.sin(r)}"/>`}).join('')}
+  </g><circle cx="50" cy="50" r="23" fill="#e9b23c"/></svg>`;
+const STAR = c=>`<svg viewBox="0 0 100 100"><polygon fill="${c}" stroke="${c}" stroke-width="8" stroke-linejoin="round" points="50,8 61,38 93,38 67,57 77,89 50,70 23,89 33,57 7,38 39,38"/></svg>`;
+const TREE = `<svg viewBox="0 0 60 110"><rect x="27" y="86" width="6" height="22" rx="2" fill="#8a5a3b"/>
+  <polygon fill="#6f8a5c" points="30,2 46,30 38,30 52,56 42,56 58,88 2,88 18,56 8,56 22,30 14,30"/></svg>`;
+const SPRIG = (flip)=>`<svg viewBox="0 0 100 100" style="${flip?'transform:scaleX(-1)':''}"><path d="M10 92 Q45 60 88 18" stroke="#6f8a5c" stroke-width="4" fill="none" stroke-linecap="round"/>
+  ${[[30,70,-30],[48,52,-40],[66,36,-45],[24,58,40],[42,40,35],[60,24,30]].map(([x,y,r],i)=>`<ellipse cx="${x+(i<3?8:-6)}" cy="${y+(i<3?6:-4)}" rx="12" ry="5.5" fill="#6f8a5c" transform="rotate(${i<3?r+60:r-80} ${x} ${y})"/>`).join('')}</svg>`;
+const RAYS = (side)=>`<svg viewBox="0 0 40 60"><g stroke="#e9b23c" stroke-width="4" stroke-linecap="round">
+  ${side==='l'?'<line x1="30" y1="10" x2="20" y2="2"/><line x1="26" y1="30" x2="10" y2="30"/><line x1="30" y1="50" x2="20" y2="58"/>'
+              :'<line x1="10" y1="10" x2="20" y2="2"/><line x1="14" y1="30" x2="30" y2="30"/><line x1="10" y1="50" x2="20" y2="58"/>'}
+  </g></svg>`;
+const SPARK = `<svg viewBox="0 0 40 40"><g stroke="#8fa07a" stroke-width="3.5" stroke-linecap="round"><line x1="8" y1="14" x2="18" y2="20"/><line x1="16" y1="4" x2="22" y2="15"/></g></svg>`;
+const MINI_SPRIG = (flip)=>`<svg viewBox="0 0 60 40" style="${flip?'transform:scaleX(-1)':''}"><path d="M4 36 Q26 26 44 8" stroke="#6f8a5c" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <ellipse cx="18" cy="22" rx="8" ry="3.5" fill="#6f8a5c" transform="rotate(-70 18 22)"/><ellipse cx="30" cy="16" rx="8" ry="3.5" fill="#6f8a5c" transform="rotate(-80 30 16)"/>
+  <ellipse cx="22" cy="32" rx="8" ry="3.5" fill="#6f8a5c" transform="rotate(10 22 32)"/><ellipse cx="36" cy="24" rx="8" ry="3.5" fill="#6f8a5c" transform="rotate(0 36 24)"/>
+  <circle cx="52" cy="22" r="2.4" fill="#e9a35c"/><circle cx="56" cy="32" r="2" fill="#e9a35c"/></svg>`;
+
+/* ===== 工具 ===== */
+const shuffle = a => { a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];} return a; };
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const attr = s => esc(s).replace(/"/g,'&quot;');
+
+// 一般字母標開頭；X 標字裡每個 x
+const isInside = L => !!(LETTERS[L] && LETTERS[L].inside);
+const hasLetter = (w, L) => isInside(L) ? w.toLowerCase().includes(L.toLowerCase()) : w[0].toUpperCase()===L;
+function markWord(t, L, cls){
+  if(isInside(L)) return [...t].map(c=>c.toUpperCase()===L ? `<span class="${cls}">${esc(c)}</span>` : esc(c)).join('');
+  return t[0].toUpperCase()===L ? `<span class="${cls}">${esc(t[0])}</span>${esc(t.slice(1))}` : esc(t);
+}
+function wordHTML(w, L, maxMm){
+  return `<div class="word" style="font-size:${maxMm}mm">${markWord(w, L, 'first')}</div>`;
+}
+function fitFont(w, widthMm, maxMm){
+  return Math.min(maxMm, widthMm / (w.length * 0.56));
+}
+function sentenceHTML(s, L){
+  return s.split(' ').map(t => markWord(t, L, 'hl')).join(' ');
+}
+
+// 練寫用的四線格（上線、虛線中線、基線）+ 描字
+function traceSVG(texts, mode){
+  const W=120, H=24, top=5, mid=10.2, base=20;
+  let lines = `<line x1="0" y1="${top}" x2="${W}" y2="${top}" stroke="#c9bdb2" stroke-width=".35"/>
+    <line x1="0" y1="${mid}" x2="${W}" y2="${mid}" stroke="#c9bdb2" stroke-width=".35" stroke-dasharray="1.6 1.2"/>
+    <line x1="0" y1="${base}" x2="${W}" y2="${base}" stroke="#8f847b" stroke-width=".5"/>`;
+  let t = '';
+  const style = `font-family:Andika,'Comic Sans MS',sans-serif;font-size:20px;fill:none;stroke:#8d8d8d;stroke-width:.45;stroke-dasharray:1.3 .9`;
+  if(mode==='letters'){
+    // M、W 比較寬，字小一點才不會黏在一起；縮小後線位跟著字的比例
+    const wide = /[MW]/.test(texts[0]);
+    const st = wide ? style.replace('font-size:20px','font-size:15px') : style;
+    t = texts.map((s,i)=>`<text x="${20+i*40}" y="${base}" text-anchor="middle" style="${st}">${esc(s)}</text>`).join('');
+    if(wide) lines = lines.replace(`y1="${top}" x2="${W}" y2="${top}"`, `y1="${base-10.9}" x2="${W}" y2="${base-10.9}"`)
+                           .replace(`y1="${mid}" x2="${W}" y2="${mid}"`, `y1="${base-7.4}" x2="${W}" y2="${base-7.4}"`);
+  }else if(mode==='word'){
+    t = `<text x="${W/2}" y="${base}" text-anchor="middle" style="${style}">${esc(texts[0])}</text>`;
+  }
+  return `<svg class="trace" viewBox="0 0 ${W} ${H}">${lines}${t}</svg>`;
+}
+
+/* ===== 一張練習卷 ===== */
+function sheetHTML(L){
+  const cfg = LETTERS[L];
+  const feat = cfg.f.map(byWord);
+  const n = feat.length;
+  const cardW = n===4||n===2 ? 88 : n===3 ? 58 : 180;
+  const maxF = n===4 ? 12 : n===1 ? 20 : 14;
+  const picMm = n===4 ? 28 : n===1 ? 62 : 46;
+
+  const cards = feat.map((it,i)=>`
+    <div class="card say" data-say="${attr(it.w)}">
+      <span class="spk">🔊</span>
+      <div class="spark" style="${i%2?'right:6mm;top:5mm;transform:scaleX(-1)':'left:6mm;top:5mm'}">${SPARK}</div>
+      <div class="pic">${picHTML(it,picMm)}</div>
+      ${wordHTML(it.w, L, fitFont(it.w, cardW*0.9, maxF))}
+      <div class="zh">${it.zh}</div>
+    </div>`).join('');
+
+  // Find it：最多 3 個目標字，其餘是其他字母開頭的干擾項，共 6 格
+  const targets = shuffle(ALL.filter(x=>hasLetter(x.w, L))).slice(0,3);
+  const avoid = CONFUSE[L];
+  const distract = shuffle(ALL.filter(x=>{
+    const c=x.w[0].toUpperCase();
+    // 同一個圖案（例如 quack 和 duck）不要同時出現
+    return !hasLetter(x.w, L) && c!==avoid && x.kind!=='num' && !(x.e && targets.some(t=>t.e===x.e));
+  })).slice(0, 6-targets.length);
+  const findInst = isInside(L)
+    ? `Circle the pictures with the letter ${L.toLowerCase()}.<small>圈出單字裡有 ${L.toLowerCase()} 的圖</small>`
+    : `Circle the pictures that start with ${L}.<small>圈出開頭是 ${L} 的圖</small>`;
+  const pillText = cfg.pill || `is for ${esc(cfg.f[0])}`;
+  // 念出來的句子（X 的 /ks/ 用例字帶過，語音念音標會怪怪的）
+  const letterSay = `the letter ${L}`;
+  const pillSay = isInside(L) ? `${L}. ${cfg.f.slice(0,3).join(', ')}.` : `${L} is for ${cfg.f[0]}.`;
+  const findItems = shuffle([...targets, ...distract]).map(it=>`
+    <div class="fi say" data-say="${attr(it.w)}" data-ok="${targets.includes(it)?1:0}"><div class="pic">${picHTML(it,17)}</div><div class="lbl">${esc(it.w)}</div></div>`).join('');
+
+  const lo = L.toLowerCase();
+  const traceWord = cfg.f.map(byWord).find(x=>x.kind!=='num')?.w || cfg.f[0];
+
+  return `
+  <section class="sheet" data-letter="${L}">
+    <button class="play" title="從頭念一次">▶ Listen</button>
+    <div class="head">
+      <div class="deco" style="left:8mm;top:1mm;width:27mm;height:27mm">${SUN}</div>
+      <div class="deco" style="left:0;top:26mm;width:26mm;height:26mm">${SPRIG(false)}</div>
+      <div class="deco" style="left:30mm;top:33mm;width:8mm;height:8mm">${STAR('#eba98a')}</div>
+      <div class="deco" style="left:4mm;top:24mm;width:3mm;height:3mm;border-radius:50%;background:#e9a35c"></div>
+      <div class="deco" style="left:52mm;top:10mm;width:10mm;height:15mm">${RAYS('l')}</div>
+      <div class="deco" style="right:52mm;top:10mm;width:10mm;height:15mm">${RAYS('r')}</div>
+      <div class="big say" data-say="${attr(letterSay)}"><span class="up">${L}</span><span class="lo">${lo}</span></div>
+      <div class="pill say" data-say="${attr(pillSay)}"><b>${L}</b> ${pillText}</div>
+      <div class="deco" style="right:30mm;top:5mm;width:9mm;height:9mm">${STAR('#eba98a')}</div>
+      <div class="deco" style="right:32mm;top:20mm;width:2.6mm;height:2.6mm;border-radius:50%;background:#e9a35c"></div>
+      <div class="deco" style="right:27mm;top:27mm;width:16mm;height:20mm">${SPRIG(true)}</div>
+      <div class="deco" style="right:4mm;top:1mm;width:24mm;height:46mm">${TREE}</div>
+    </div>
+
+    <div class="cards n${n}">${cards}</div>
+
+    <div class="banner say" data-say="${attr(cfg.s)}">${MINI_SPRIG(false)}<span>${sentenceHTML(cfg.s, L)}</span>${MINI_SPRIG(true)}</div>
+
+    <div class="bottom">
+      <div class="box find">
+        <div class="boxhead"><div class="num">1</div><div class="ttl">Find it</div></div>
+        <div class="inst say" data-say="${attr(findInst.split('<small>')[0])}">${findInst}</div>
+        <div class="grid6">${findItems}</div>
+      </div>
+      <div class="box write">
+        <div class="boxhead"><div class="num">2</div><div class="ttl">Write it</div></div>
+        <div class="inst">Trace the letters and the word.<small>沿著虛線描寫</small></div>
+        <div class="trace say" data-say="${attr(letterSay)}">${traceSVG([L+lo, L+lo, L+lo], 'letters')}</div>
+        <div class="trace say" data-say="${attr(traceWord)}">${traceSVG([traceWord], 'word')}</div>
+        <div class="wlabel">Write your own ${L}${lo}:</div>
+        ${traceSVG([], 'blank')}
+      </div>
+    </div>
+
+    <div class="foot">
+      <span>Name:<span class="blank"></span></span>
+      <span>Date:<span class="blank"></span></span>
+    </div>
+  </section>`;
+}
+
+/* ===== 介面 ===== */
+const sel = document.getElementById('letterSel');
+const pages = document.getElementById('pages');
+const KEYS = Object.keys(LETTERS).sort();
+sel.innerHTML = KEYS.map(L=>`<option value="${L}">${L} ${LETTERS[L].f[0]}</option>`).join('')
+  + `<option value="ALL">全部字母（${KEYS.length} 張）</option>`;
+
+function render(){
+  const v = sel.value;
+  const list = v==='ALL' ? KEYS : [v];
+  pages.innerHTML = list.map(sheetHTML).join('');
+  try{ localStorage.setItem('ws-letter', v); }catch(e){}
+}
+try{ const saved = localStorage.getItem('ws-letter'); if(saved && [...sel.options].some(o=>o.value===saved)) sel.value = saved; }catch(e){}
+sel.addEventListener('change', render);
+document.getElementById('shuffleBtn').addEventListener('click', render);
+document.getElementById('printBtn').addEventListener('click', ()=>window.print());
+
+/* ===== 語音（瀏覽器內建的英文發音） ===== */
+const TTS = 'speechSynthesis' in window ? window.speechSynthesis : null;
+let VOICE = null;
+function pickVoice(){
+  if(!TTS) return;
+  const vs = TTS.getVoices();
+  VOICE = vs.find(v=>/en[-_]US/i.test(v.lang) && /(Aria|Jenny|Ana|Google US|Samantha|Zira)/i.test(v.name))
+       || vs.find(v=>/en[-_]US/i.test(v.lang)) || vs.find(v=>/^en/i.test(v.lang)) || null;
+}
+if(TTS){ pickVoice(); TTS.onvoiceschanged = pickVoice; }
+const slowBox = document.getElementById('slowToggle');
+
+function clearSpeaking(){ document.querySelectorAll('.speaking').forEach(x=>x.classList.remove('speaking')); }
+function utter(text, el){
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US'; if(VOICE) u.voice = VOICE;
+  u.rate = slowBox.checked ? 0.6 : 0.85;   // 給小朋友聽，比正常慢一點
+  u.pitch = 1.1;
+  u.onstart = ()=>{ clearSpeaking(); el && el.classList.add('speaking'); };
+  u.onend = u.onerror = ()=>{ el && el.classList.remove('speaking'); };
+  return u;
+}
+// 念一串：[[文字, 要亮起來的元素], ...]
+function sayList(list){
+  if(!TTS){ alert('這個瀏覽器不支援語音，請改用 Chrome 或 Edge。'); return; }
+  TTS.cancel(); clearSpeaking();
+  list.forEach(([t,el])=>TTS.speak(utter(t,el)));
+}
+const say = (t, el) => sayList([[t, el]]);
+
+function playSheet(sheet){
+  const q = [];
+  const big = sheet.querySelector('.big'); q.push([big.dataset.say, big]);
+  const pill = sheet.querySelector('.pill'); q.push([pill.dataset.say, pill]);
+  sheet.querySelectorAll('.card').forEach(c=>q.push([c.dataset.say, c]));
+  const b = sheet.querySelector('.banner'); q.push([b.dataset.say, b]);
+  sayList(q);
+}
+
+/* ===== Find it 互動：點圖來圈 ===== */
+function cheer(){
+  const c = document.getElementById('cheer');
+  c.classList.add('show'); setTimeout(()=>c.classList.remove('show'), 2200);
+}
+function handleFind(fi){
+  const sheet = fi.closest('.sheet'), L = sheet.dataset.letter, w = fi.dataset.say;
+  const rule = isInside(L) ? `has the letter ${L.toLowerCase()}` : `starts with ${L}`;
+  if(fi.dataset.ok==='1'){
+    if(fi.classList.contains('circled')){ say(w, fi); return; }
+    fi.classList.add('circled');
+    const left = sheet.querySelectorAll('.fi[data-ok="1"]:not(.circled)').length;
+    if(left===0){
+      sayList([[`Yes! ${w} ${rule}.`, fi], ['Great job! You found them all!', null]]);
+      setTimeout(cheer, 900);
+    }else{
+      sayList([[`Yes! ${w} ${rule}.`, fi]]);
+    }
+  }else{
+    fi.classList.remove('wrong'); void fi.offsetWidth; fi.classList.add('wrong');
+    const real = isInside(L) ? `${w} has no ${L.toLowerCase()}` : `${w} starts with ${w[0].toUpperCase()}`;
+    say(`Oops! ${real}. Try again!`, fi);
+  }
+}
+
+pages.addEventListener('click', e=>{
+  const p = e.target.closest('.play'); if(p){ playSheet(p.closest('.sheet')); return; }
+  const fi = e.target.closest('.fi'); if(fi){ handleFind(fi); return; }
+  const s = e.target.closest('[data-say]'); if(s) say(s.dataset.say, s);
+});
+document.getElementById('clearBtn').addEventListener('click', ()=>{
+  document.querySelectorAll('.fi.circled').forEach(x=>x.classList.remove('circled'));
+});
+document.getElementById('zhToggle').addEventListener('change', e=>document.body.classList.toggle('nozh', !e.target.checked));
+render();
+</script>
+</body>
+</html>
